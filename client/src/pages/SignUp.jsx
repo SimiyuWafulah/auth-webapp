@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import {Link, useNavigate} from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -29,14 +31,15 @@ export default function SignUp() {
       const data = await res.json();
       if(data.success ===false) {
         setLoading(false);
-        setError(data.message);
+        toast.error(data.message);
         return
       }
       setLoading(false);
+      toast.success('Sign up successful');
       navigate('/signin')
     } catch (error) {
       setLoading(false);
-      setError(error.message)
+      toast.error(error.message)
     }
   }
   return (
@@ -78,6 +81,7 @@ export default function SignUp() {
         <span className='text-blue-700'>Sign In</span>
       </Link>
     </div>
+    <ToastContainer/>
    </div>
   )
 }
