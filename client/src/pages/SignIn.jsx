@@ -36,7 +36,7 @@ export default function SignIn() {
       }
       setLoading(false);
       toast.success('Sign in successful');
-      navigate('/signin')
+      navigate('/')
     } catch (error) {
       setLoading(false);
       toast.error(error.message)
