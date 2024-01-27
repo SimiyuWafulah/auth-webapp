@@ -31,14 +31,15 @@ export default function SignIn() {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-      if(data.success ===false) {
+      if(!res.ok || data.success ===false) {
         dispatch(signInFailure(data.message))
         toast.error(data.message);
         return
       }
-      dispatch(signInSuccess(data))
-      toast.success('Sign in successful');
+
+      dispatch(signInSuccess(data));
       navigate('/')
+      toast.success('Sign in successful');
     } catch (error) {
       dispatch(signInFailure(error.message))
       toast.error(error.message)
@@ -80,3 +81,4 @@ export default function SignIn() {
    </div>
   )
 }
+
