@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+import Oauth from '../components/Oauth';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -73,6 +74,7 @@ export default function SignUp() {
       >
      {loading ? 'Loading...' : 'Sign Up'}
       </button>
+      <Oauth/>
     </form>
     <div className='flex gap-2 mt-5
     onChange = {handleChange}'>

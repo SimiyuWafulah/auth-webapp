@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 import {useDispatch, useSelector } from 'react-redux';
+import Oauth from '../components/Oauth';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -55,6 +56,7 @@ export default function SignIn() {
         id='email'
         className='border p-3 rounded-lg'
         onChange = {handleChange}
+        required
       />
       <input
         type='password'
@@ -62,6 +64,7 @@ export default function SignIn() {
         id='password'
         className='border p-3 rounded-lg'
         onChange = {handleChange}
+        required
       />
       <button 
       disabled ={loading}
@@ -69,6 +72,7 @@ export default function SignIn() {
       >
      {loading ? 'Loading...' : 'Sign In'}
       </button>
+      <Oauth/>
     </form>
     <div className='flex gap-2 mt-5
     onChange = {handleChange}'>
