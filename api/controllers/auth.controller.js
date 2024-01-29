@@ -3,7 +3,24 @@ import { errorHandler } from "../utils/error.js";
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-dotenv.config()
+import session from "express-session";
+import connectMongo from 'connect-mongo'
+dotenv.config();
+
+const MongoStore = connectMongo(session);
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: {
+        maxAge: 3600000, // Set the session cookie expiration time (in milliseconds)
+        httpOnly: true,
+        secure: true, // Use secure cookies in production
+        sameSite: 'None'
+    }
+}));
 
 export const signup = async (req, res, next) => {
     const {username, email, password} = req.body;
@@ -33,11 +50,18 @@ export const signin = async (req, res, next) => {
         const authPassword = bcryptjs.compareSync(password,authenticatedUser.password);
         if(!authPassword) return next(errorHandler(404, 'Wrong Credentials'));
 
+        //user info saved to session
+        req.session.user = {
+            id: authenticatedUser._id,
+            username: authenticatedUser.username,
+        };
+
         //generating tokens for user if they are found to exist in the db
         const token = jwt.sign({id: authenticatedUser._id}, process.env.JWT_KEY);
+        const expiryDate = new Date(Date.now() + 3600000)
         const {password: pass, ...rest} = authenticatedUser._doc
         res
-        .cookie('access_token', token, {httpOnly: true, secure: true, sameSite: 'None'})
+        .cookie('access_token', token, {httpOnly: true, secure: true, sameSite: 'None', expires: expiryDate})
         .status(201)
         .json(rest)
     } catch (error) {
@@ -50,14 +74,29 @@ export const google = async (req, res, next) => {
         //check if account exists
         const user = await User.findOne({email: req.body.email});
         if (user) {
+
+            //user info saved to session
+            req.session.user = {
+                id: user._id,
+                username: user.username,
+        };
+
             const token = jwt.sign({id:user._id}, process.env.JWT_KEY);
+            const expiryDate =new Date(Date.now() + 3600000);
             const {password: pass, ...rest} = user._id;
-            res.cookie('access_token', token, {httpOnly: true}).status(200).json(rest)
+            res.cookie('access_token', token, {httpOnly: true, expires: expiryDate}).status(200).json(rest)
         } else {
             const createPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
             const hashPassword = bcryptjs.hashSync(createPassword, 10);
             const newUser = await User({username: req.body.name.split(" ").join(" ") + Math.random().toString(36).slice(-4), email:req.body.email, password:hashPassword, avatar: req.body.photoUrl});
             await newUser.save();
+
+            //user info saved to session
+            req.session.user = {
+                id: newUser._id,
+                username: newUser.username,
+           };
+    
             const token = jwt.sign({id:newUser._id}, process.env.JWT_KEY);
             const {password:pass, ...rest} = newUser._doc
             res.cookie('access_token', token, {httpOnly:true}).status(200).json(rest)
