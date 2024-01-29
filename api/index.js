@@ -4,9 +4,9 @@ import dotenv from 'dotenv'
 import userRouter from './routes/user.route.js'
 import authRouter from './routes/auth.route.js'
 import { errorMiddleware } from './middlewares/error.middleware.js';
-import cors from 'cors'
 import session from 'express-session'
-import connectMongo from 'connect-mongo'
+import cors from 'cors'
+import MongoStore from 'connect-mongo';
 dotenv.config();
 
 const app = express();
@@ -19,19 +19,20 @@ mongoose.connect(process.env.MONGO).then(() => {
     console.log(error)
 });
 
-//session storing
-const MongoStore = connectMongo(session);
-
-//session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
+        mongoUrl: process.env.MONGO, 
+        collectionName: 'sessions', 
+        ttl: 1209600,
+    }),
     cookie: {
-        maxAge: 3600000, 
+        maxAge: 3600000,
         httpOnly: true,
-        secure: true, 
+        secure: true,
         sameSite: 'None'
     }
 }));
