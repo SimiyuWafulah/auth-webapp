@@ -70,7 +70,7 @@ export const google = async (req, res, next) => {
         } else {
             const createPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
             const hashPassword = bcryptjs.hashSync(createPassword, 10);
-            const newUser = await User({username: req.body.name.split(" ").join(" ") + Math.random().toString(36).slice(-4), email:req.body.email, password:hashPassword, avatar: req.body.photoUrl});
+            const newUser = await User({username: req.body.name.split(" ").join(" ") + Math.random().toString(36).slice(-4), email:req.body.email, password:hashPassword, profilePic: req.body.photoUrl});
             await newUser.save();
             //storing user info to session
             req.session.user = {
