@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodejs api/index.js",
     "dev": "nodemon api/index.js",
-    "build": "npm install && --prefix client && npm build --prefix client"
+    "build": "npm install && cd client && npm build cd prefix client"
   },
   "keywords": [],
   "author": "",
