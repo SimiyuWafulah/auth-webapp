@@ -9,11 +9,20 @@ import cors from 'cors'
 import MongoStore from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 dotenv.config();
+import path from 'path'
 
 const app = express();
 app.use(express.json());
 app.use(cors())
 app.use(cookieParser())
+
+const __dirname = path.resolve();
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 mongoose.connect(process.env.MONGO).then(() => {
     console.log('Connected to Database')

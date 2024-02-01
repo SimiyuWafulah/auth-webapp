@@ -56,7 +56,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart())
-      const res = await fetch(`http://localhost:3000/api/user/update-user/${currentUser._id}`,{
+      const res = await fetch(`/api/user/update-user/${currentUser._id}`,{
         method:'POST',
         mode: 'cors',
         headers: {
@@ -79,7 +79,7 @@ export default function Profile() {
   const handleDelete = async () => {
     try {
       dispatch(deleteUserStart());
-      const res =await fetch(`http://localhost:3000/user/delete-user/${currentUser._id}`, {
+      const res =await fetch(`/api/user/delete-user/${currentUser._id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -95,7 +95,7 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     try {
-      await fetch('http://localhost:3000/api/auth/signout');
+      await fetch('/api/auth/signout');
       dispatch(signOut());
     } catch (error) {
       console.log(error)
