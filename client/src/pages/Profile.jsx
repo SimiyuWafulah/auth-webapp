@@ -8,7 +8,7 @@ import {
 } from 'firebase/storage';
 import { app } from '../firebase';
 import{updateUserStart,updateUserSuccess,updateUserFailure, signInFailure} from '../redux/user/userSlice';
-import { UseDispatch } from 'react-redux';
+
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -16,9 +16,10 @@ export default function Profile() {
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const [updateSuccess, setUpdateSuccess] = useState(false)
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   useEffect(() => {
     if (image) {
       handleFileUpload(image);
@@ -55,7 +56,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart())
-      const res = await fetch(`http://localhost:3000/api/user/update/${currentUser._id}`,{
+      const res = await fetch(`http://localhost:3000/api/user/update-user/${currentUser._id}`,{
         method:'POST',
         mode: 'cors',
         headers: {
@@ -69,6 +70,7 @@ export default function Profile() {
         return;
       }
       dispatch(updateUserSuccess(data))
+      setUpdateSuccess(true)
     } catch (error) {
       dispatch(updateUserFailure(error))
     }
@@ -125,13 +127,15 @@ export default function Profile() {
           onChange={handleChange}
         />
         <button className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
-          update
+          {loading ? 'Loading...' : 'Update'}
         </button>
       </form>
       <div className='flex justify-between mt-5'>
         <span className='text-red-700 cursor-pointer'>Delete Account</span>
         <span className='text-red-700 cursor-pointer'>Sign out</span>
       </div>
+      <p className='text-red-700 mt-5'>{error && 'Something went wrong'}</p>
+      <p className='text-green-700 mt-5'>{updateSuccess && 'Update Successful'}</p>
     </div>
   );
 }
