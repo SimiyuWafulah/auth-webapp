@@ -18,7 +18,6 @@ export default function Oauth() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization' : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YjBkZWMyNjQ5ZjQ2ODA3NDVlZWQxZSIsImlhdCI6MTcwNjUyNzA5NX0.Vn3ZRYC6pyNpZ1o50pShRH3FG9IWnDtLzrFBfMA_s-4"
         },
         body: JSON.stringify({
           name: result.user.displayName,
