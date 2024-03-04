@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
+import Cookies from 'universal-cookie'
 import {
   getDownloadURL,
   getStorage,
@@ -17,7 +18,10 @@ export default function Profile() {
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
-  const [updateSuccess, setUpdateSuccess] = useState(false)
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  const cookies = new Cookies();
+
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
   useEffect(() => {
@@ -25,11 +29,14 @@ export default function Profile() {
       handleFileUpload(image);
     }
   }, [image]);
+  
   const handleFileUpload = async (image) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + image.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, image);
+
+
     uploadTask.on(
       'state_changed',
       (snapshot) => {
@@ -42,7 +49,7 @@ export default function Profile() {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, profilePicture: downloadURL })
+          setFormData({ ...formData, profilePic: downloadURL })
         );
       }
     );
@@ -59,8 +66,10 @@ export default function Profile() {
       const res = await fetch(`/api/user/update-user/${currentUser._id}`,{
         method:'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
-          'Comtent-Type':'application/json'
+          'Content-Type':'application/json',
+          'Authorization': `Bearer${cookies.get('access_token')}`
         },
         body: JSON.stringify(formData)
       });
